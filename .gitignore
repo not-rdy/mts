@@ -1,1 +1,5 @@
 data
+models
+src/base/__pycache__
+src/lib/__pycache__
+src/SQLite.sql
