@@ -3,3 +3,7 @@ models
 src/base/__pycache__
 src/lib/__pycache__
 src/SQLite.sql
+src/.ipynb_checkpoints
+.vscode
+.ipynb_checkpoints
+notebooks/.ipynb_checkpoints
