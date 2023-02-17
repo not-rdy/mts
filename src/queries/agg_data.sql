@@ -1,4 +1,4 @@
-create table agg_data_test as
+create table agg_data as
     select
         user_id, date, part_of_day,
         avg(region_name_encoded) as region_name,
@@ -9,8 +9,9 @@ create table agg_data_test as
         avg(cpe_type_cd_encoded) as cpe_type_cd,
         avg(cpe_model_os_type_encoded) as cpe_model_os_type,
         avg(price) as price,
-        avg(request_cnt) as request_cnt
+        avg(request_cnt) as request_cnt,
+        avg(age) as age
     from
-        data_prepared_test
+        data_prepared
     group by
         user_id, date, part_of_day

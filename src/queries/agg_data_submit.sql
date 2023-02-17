@@ -1,4 +1,4 @@
-create table agg_data_train as
+create table agg_data_submit as
     select
         user_id, date, part_of_day,
         avg(region_name_encoded) as region_name,
@@ -9,9 +9,8 @@ create table agg_data_train as
         avg(cpe_type_cd_encoded) as cpe_type_cd,
         avg(cpe_model_os_type_encoded) as cpe_model_os_type,
         avg(price) as price,
-        avg(request_cnt) as request_cnt,
-        avg(age) as age
+        avg(request_cnt) as request_cnt
     from
-        data_prepared_train
+        data_prepared_submit
     group by
         user_id, date, part_of_day

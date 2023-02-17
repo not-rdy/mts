@@ -1,5 +1,5 @@
 -- SQLite
-create table data_prepared_test as
+create table data_prepared as
     select
         region_name_encoded,
         city_name_encoded,
@@ -12,7 +12,8 @@ create table data_prepared_test as
         date,
         part_of_day,
         request_cnt,
-        user_id
+        user_id,
+        age
     from
         (
             select
@@ -27,11 +28,12 @@ create table data_prepared_test as
                 date,
                 part_of_day,
                 request_cnt,
-                user_id
+                user_id,
+                age
             from
                 data
             where
-                age = 'NULL'
+                age != 'NULL'
         ) as t1
         left join
         (

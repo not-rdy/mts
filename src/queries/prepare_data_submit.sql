@@ -1,5 +1,5 @@
 -- SQLite
-create table data_prepared_train as
+create table data_prepared_submit as
     select
         region_name_encoded,
         city_name_encoded,
@@ -12,8 +12,7 @@ create table data_prepared_train as
         date,
         part_of_day,
         request_cnt,
-        user_id,
-        age
+        user_id
     from
         (
             select
@@ -28,12 +27,11 @@ create table data_prepared_train as
                 date,
                 part_of_day,
                 request_cnt,
-                user_id,
-                age
+                user_id
             from
                 data
             where
-                age != 'NULL'
+                age = 'NULL'
         ) as t1
         left join
         (
