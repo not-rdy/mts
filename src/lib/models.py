@@ -35,6 +35,8 @@ class GCN(torch.nn.Module):
         x = F.relu(x)
         x = self.conv2(x, edge_index)
         x = F.relu(x)
+        x = self.conv3(x, edge_index)
+        x = F.relu(x)
         x = F.dropout(x, training=self.training)
         x = self.agg(x, graph.batch)
         x = self.lin2(x)
