@@ -7,3 +7,4 @@ src/.ipynb_checkpoints
 .vscode
 .ipynb_checkpoints
 notebooks/.ipynb_checkpoints
+mlruns

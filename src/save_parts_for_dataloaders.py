@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pandas as pd
 import networkx as nx
 from tqdm import tqdm
@@ -7,6 +8,30 @@ from torch_geometric.utils.convert import from_networkx
 from lib.utils import save_f
 from lib.DBManager import DBManager
 from base.settings import connector, PATH_DATA_INTERIM
+
+
+def get_age_bucket(x: int) -> int:
+    # age buckets
+    b1 = pd.Interval(left=18, right=25, closed='right')
+    b2 = pd.Interval(left=25, right=35, closed='right')
+    b3 = pd.Interval(left=35, right=45, closed='right')
+    b4 = pd.Interval(left=45, right=55, closed='right')
+    b5 = pd.Interval(left=55, right=65, closed='right')
+    b6 = pd.Interval(left=65, right=np.inf, closed='right')
+    if x in b1:
+        return 0
+    elif x in b2:
+        return 1
+    elif x in b3:
+        return 2
+    elif x in b4:
+        return 3
+    elif x in b5:
+        return 4
+    elif x in b6:
+        return 5
+    else:
+        return np.nan
 
 
 def create_graphs(users_part: list) -> list:
@@ -41,6 +66,97 @@ def create_graphs(users_part: list) -> list:
     users_part = pd.get_dummies(data=users_part, columns=['part_of_day'])
     users_part = users_part.set_index(['user_id'])
     users_part = users_part.drop(['date', 'part_of_day_encoded'], axis=1)
+
+    users_part['age'] = users_part['age'].map(lambda x: get_age_bucket(x))
+    users_part = users_part.dropna()
+
+    y = users_part['age'].copy()
+    users_part = users_part.drop('age', axis=1)
+    cols_date = [
+        'day', 'month', 'year',
+        'day_of_week', 'day_of_year']
+    for col in cols_date:
+        x = users_part[col].copy()
+        x_std = (x - x.min()) / (x.max() - x.min())
+        users_part[col] = x_std.tolist()
+    cols_other = [
+        'region_name', 'city_name', 'cpe_manufacturer_name',
+        'cpe_model_name', 'url_host', 'cpe_type_cd',
+        'cpe_model_os_type', 'price', 'request_cnt']
+    stats = db.read_data_as_df(
+        """
+        select
+            min(region_name) as min_region_name,
+            min(city_name) as min_city_name,
+            min(cpe_manufacturer_name) as min_cpe_manufacturer_name,
+            min(cpe_model_name) as min_cpe_model_name,
+            min(url_host) as min_url_host,
+            min(cpe_type_cd) as min_cpe_type_cd,
+            min(cpe_model_os_type) as min_cpe_model_os_type,
+            min(price) as min_price,
+            min(request_cnt) as min_request_cnt,
+            max(region_name) as max_region_name,
+            max(city_name) as max_city_name,
+            max(cpe_manufacturer_name) as max_cpe_manufacturer_name,
+            max(cpe_model_name) as max_cpe_model_name,
+            max(url_host) as max_url_host,
+            max(cpe_type_cd) as max_cpe_type_cd,
+            max(cpe_model_os_type) as max_cpe_model_os_type,
+            max(price) as max_price,
+            max(request_cnt) as max_request_cnt
+        from
+            agg_data
+        """
+    )
+    for col in cols_other:
+        x = users_part[col].copy()
+        if col == 'region_name':
+            col_min = 'min_region_name'
+            col_max = 'max_region_name'
+            x_std = (x - stats[col_min].item()) /\
+                (stats[col_max].item() - stats[col_min].item())
+        elif col == 'city_name':
+            col_min = 'min_city_name'
+            col_max = 'max_city_name'
+            x_std = (x - stats[col_min].item()) /\
+                (stats[col_max].item() - stats[col_min].item())
+        elif col == 'cpe_manufacturer_name':
+            col_min = 'min_cpe_manufacturer_name'
+            col_max = 'max_cpe_manufacturer_name'
+            x_std = (x - stats[col_min].item()) /\
+                (stats[col_max].item() - stats[col_min].item())
+        elif col == 'cpe_model_name':
+            col_min = 'min_cpe_model_name'
+            col_max = 'max_cpe_model_name'
+            x_std = (x - stats[col_min].item()) /\
+                (stats[col_max].item() - stats[col_min].item())
+        elif col == 'url_host':
+            col_min = 'min_url_host'
+            col_max = 'max_url_host'
+            x_std = (x - stats[col_min].item()) /\
+                (stats[col_max].item() - stats[col_min].item())
+        elif col == 'cpe_type_cd':
+            col_min = 'min_cpe_type_cd'
+            col_max = 'max_cpe_type_cd'
+            x_std = (x - stats[col_min].item()) /\
+                (stats[col_max].item() - stats[col_min].item())
+        elif col == 'cpe_model_os_type':
+            col_min = 'min_cpe_model_os_type'
+            col_max = 'max_cpe_model_os_type'
+            x_std = (x - stats[col_min].item()) /\
+                (stats[col_max].item() - stats[col_min].item())
+        elif col == 'price':
+            col_min = 'min_price'
+            col_max = 'max_price'
+            x_std = (x - stats[col_min].item()) /\
+                (stats[col_max].item() - stats[col_min].item())
+        elif col == 'request_cnt':
+            col_min = 'min_request_cnt'
+            col_max = 'max_request_cnt'
+            x_std = (x - stats[col_min].item()) /\
+                (stats[col_max].item() - stats[col_min].item())
+        users_part[col] = x_std.tolist()
+    users_part['age'] = y.tolist()
 
     list_users_graph = []
     for idx in users_part.index.unique():
