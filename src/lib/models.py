@@ -5,8 +5,8 @@ from torch_geometric.nn.aggr import MulAggregation
 
 params_GCN = {
     'device': 'cuda',
-    'batch_size': 32,
-    'lr': 0.01,
+    'batch_size': 16,
+    'lr': 0.001,
     'weight_decay': 5e-4,
     'n_epochs': 100
 }
