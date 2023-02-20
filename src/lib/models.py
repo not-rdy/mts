@@ -6,9 +6,9 @@ from torch_geometric.nn.aggr import MulAggregation
 params_GCN = {
     'device': 'cuda',
     'batch_size': 32,
-    'lr': 0.001,
+    'lr': 0.01,
     'weight_decay': 5e-4,
-    'n_epochs': 20
+    'n_epochs': 100
 }
 
 
@@ -18,7 +18,8 @@ class GCN(torch.nn.Module):
         super().__init__()
         self.lin1 = torch.nn.Linear(19, 100)
         self.conv1 = GCNConv(100, 100)
-        self.conv2 = GCNConv(100, 40)
+        self.conv2 = GCNConv(100, 80)
+        self.conv3 = GCNConv(80, 40)
         self.lin2 = torch.nn.Linear(40, 6)
         self.agg = MulAggregation()
 
@@ -29,6 +30,8 @@ class GCN(torch.nn.Module):
         x = self.conv1(x, edge_index)
         x = F.relu(x)
         x = self.conv2(x, edge_index)
+        x = F.relu(x)
+        x = self.conv3(x, edge_index)
         x = F.relu(x)
         x = F.dropout(x, training=self.training)
         x = self.lin2(x)
