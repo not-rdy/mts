@@ -2,6 +2,7 @@ import os
 import torch
 import mlflow
 from tqdm import tqdm
+from lib.utils import save_f
 from lib.utils import load_f
 from base.settings import PATH_DATA_INTERIM
 from lib.models import GCN, params_GCN
@@ -60,6 +61,7 @@ if __name__ == '__main__':
 
         list_loss_train = []
         list_loss_val = []
+        list_loss_test = []
         print(f"[Epoch: {epoch}]")
 
         model.train()
@@ -92,6 +94,23 @@ if __name__ == '__main__':
         loss_val = sum(list_loss_val) / len(list_loss_val)
         mlflow.log_metric(key='loss val', value=loss_val, step=epoch)
 
-        mlflow.log_params(params=params_GCN)
+    model.eval()
+    with torch.no_grad():
+        for batch in tqdm(
+                test, total=len(test), colour='green'):
+
+            out = model(batch)
+            y = batch.y.type(torch.cuda.ByteTensor)
+            loss = loss_fun(out, y)
+
+            list_loss_test.append(loss.item())
+
+    loss_test = sum(list_loss_test) / len(list_loss_test)
+    mlflow.log_metric(key='loss test', value=loss_test)
+
+    save_f(filename=os.path.join(PATH_DATA_INTERIM, 'model.pkl'), obj=model)
+    mlflow.log_artifact(os.path.join(PATH_DATA_INTERIM, 'model.pkl'))
+
+    mlflow.log_params(params=params_GCN)
 
     mlflow.end_run()
