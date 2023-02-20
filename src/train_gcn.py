@@ -7,6 +7,7 @@ from lib.utils import load_f
 from base.settings import PATH_DATA_INTERIM
 from lib.models import GCN, params_GCN
 from torch_geometric.loader import DataLoader
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 f_names = os.listdir(PATH_DATA_INTERIM)
 f_names = [x for x in f_names if 'users' in x]
@@ -94,6 +95,8 @@ if __name__ == '__main__':
         loss_val = sum(list_loss_val) / len(list_loss_val)
         mlflow.log_metric(key='loss val', value=loss_val, step=epoch)
 
+    y_hat = []
+    y_true = []
     model.eval()
     with torch.no_grad():
         for batch in tqdm(
@@ -105,8 +108,29 @@ if __name__ == '__main__':
 
             list_loss_test.append(loss.item())
 
+            hat = list(torch.argmax(out, dim=1).cpu().numpy())
+            true = list(y.cpu().numpy())
+            y_hat.extend(hat)
+            y_true.extend(true)
+
     loss_test = sum(list_loss_test) / len(list_loss_test)
     mlflow.log_metric(key='loss test', value=loss_test)
+
+    labels = ['19-25', '26-35', '36-45', '46-55', '56-65', '66-inf']
+    conf_matrix = confusion_matrix(y_true, y_hat)
+    conf_matrix_norm = confusion_matrix(y_true, y_hat, normalize='true')
+    plot = ConfusionMatrixDisplay(
+        conf_matrix, display_labels=labels).plot().figure_
+    plot_norm = ConfusionMatrixDisplay(
+        conf_matrix_norm, display_labels=labels).plot().figure_
+    plot.savefig(
+        os.path.join(PATH_DATA_INTERIM, 'conf_matrix.png'))
+    plot_norm.savefig(
+        os.path.join(PATH_DATA_INTERIM, 'conf_matrix_norm.png'))
+    mlflow.log_artifact(
+        os.path.join(PATH_DATA_INTERIM, 'conf_matrix.png'))
+    mlflow.log_artifact(
+        os.path.join(PATH_DATA_INTERIM, 'conf_matrix_norm.png'))
 
     save_f(filename=os.path.join(PATH_DATA_INTERIM, 'model.pkl'), obj=model)
     mlflow.log_artifact(os.path.join(PATH_DATA_INTERIM, 'model.pkl'))
