@@ -40,6 +40,10 @@ for part in test_parts:
     test.extend(part)
 del test_parts
 
+print(f"n graphs train {len(train)}")
+print(f"n graphs val {len(val)}")
+print(f"n graphs test {len(test)}")
+
 batch_size = params_GCN['batch_size']
 train = DataLoader(train, batch_size)
 val = DataLoader(val, batch_size)
