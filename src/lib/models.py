@@ -6,9 +6,9 @@ from torch_geometric.nn.aggr import MaxAggregation
 params_GCN = {
     'device': 'cuda',
     'batch_size': 32,
-    'lr': 0.01,
+    'lr': 0.001,
     'weight_decay': 5e-4,
-    'n_epochs': 100
+    'n_epochs': 500
 }
 
 
@@ -18,9 +18,9 @@ class GCN(torch.nn.Module):
         super().__init__()
         self.lin1 = torch.nn.Linear(19, 100)
         self.conv1 = GCNConv(100, 90)
-        self.conv2 = GCNConv(90, 70)
-        self.lin2 = torch.nn.Linear(70, 6)
+        self.conv2 = GCNConv(90, 60)
         self.agg = MaxAggregation()
+        self.lin2 = torch.nn.Linear(60, 6)
 
     def forward(self, graph):
         x, edge_index = graph.x, graph.edge_index
