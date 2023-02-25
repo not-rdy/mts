@@ -108,8 +108,8 @@ if __name__ == '__main__':
                 list_y_val.extend(y)
         f1_val = f1_score(y_true=list_y_val, y_pred=list_out_val)
 
-        mlflow.log_metric(key='f1_train', value=f1_train)
-        mlflow.log_metric(key='f1_val', value=f1_val)
+        mlflow.log_metric(key='f1_train', value=f1_train, step=epoch)
+        mlflow.log_metric(key='f1_val', value=f1_val, step=epoch)
 
     y_hat = []
     y_true = []
@@ -129,7 +129,7 @@ if __name__ == '__main__':
             list_y_test.extend(y)
     f1_test = f1_score(y_true=list_y_test, y_pred=list_out_test)
 
-    mlflow.log_metric(key='f1_test', value=f1_test)
+    mlflow.log_metric(key='f1_test', value=f1_test, step=epoch)
 
     conf_matrix = confusion_matrix(list_y_test, list_out_test)
     conf_matrix_norm = confusion_matrix(
