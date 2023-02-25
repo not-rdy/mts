@@ -2,14 +2,15 @@ import os
 import torch
 import mlflow
 from tqdm import tqdm
-from lib.utils import save_f
-from lib.utils import load_f
+from lib.utils import save_f, load_f
 from base.settings import PATH_DATA_INTERIM
-from lib.models import GCN, params_GCN
+from lib.models import GCN_age, params_GCN
 from torch_geometric.loader import DataLoader
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
-f_names = os.listdir(PATH_DATA_INTERIM)
+PATH_GRAPHS = os.path.join(PATH_DATA_INTERIM, 'age')
+
+f_names = os.listdir(PATH_GRAPHS)
 f_names = [x for x in f_names if 'users' in x]
 
 train_names = f_names[:20]
@@ -17,11 +18,11 @@ val_names = f_names[20:25]
 test_names = f_names[25:]
 
 train_parts = [
-    load_f(os.path.join(PATH_DATA_INTERIM, name)) for name in train_names]
+    load_f(os.path.join(PATH_GRAPHS, name)) for name in train_names]
 val_parts = [
-    load_f(os.path.join(PATH_DATA_INTERIM, name)) for name in val_names]
+    load_f(os.path.join(PATH_GRAPHS, name)) for name in val_names]
 test_parts = [
-    load_f(os.path.join(PATH_DATA_INTERIM, name)) for name in test_names]
+    load_f(os.path.join(PATH_GRAPHS, name)) for name in test_names]
 
 device = torch.device(params_GCN['device'])
 train = []
@@ -44,12 +45,12 @@ print(f"n graphs train {len(train)}")
 print(f"n graphs val {len(val)}")
 print(f"n graphs test {len(test)}")
 
-batch_size = params_GCN['batch_size']
-train = DataLoader(train, batch_size)
-val = DataLoader(val, batch_size)
-test = DataLoader(test, batch_size)
 
-model = GCN().to(device)
+train = DataLoader(train, params_GCN['batch_size'])
+val = DataLoader(val, params_GCN['batch_size'])
+test = DataLoader(test, params_GCN['batch_size'])
+
+model = GCN_age().to(device)
 optimizer = torch.optim.Adam(
     model.parameters(),
     lr=params_GCN['lr'],

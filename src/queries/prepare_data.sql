@@ -13,7 +13,6 @@ create table data_prepared as
         part_of_day,
         request_cnt,
         user_id,
-        age
     from
         (
             select

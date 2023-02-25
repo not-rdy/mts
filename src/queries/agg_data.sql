@@ -10,7 +10,6 @@ create table agg_data as
         avg(cpe_model_os_type_encoded) as cpe_model_os_type,
         avg(price) as price,
         avg(request_cnt) as request_cnt,
-        avg(age) as age
     from
         data_prepared
     group by
