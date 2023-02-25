@@ -8,7 +8,7 @@ params_GCN = {
     'batch_size': 16,
     'lr': 0.001,
     'weight_decay': 5e-4,
-    'n_epochs': 400,
+    'n_epochs': 10,
     'threshold': 0.5
 }
 
