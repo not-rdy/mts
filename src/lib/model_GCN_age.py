@@ -16,7 +16,8 @@ class GCN_age(torch.nn.Module):
 
     def __init__(self) -> None:
         super().__init__()
-        self.conv1 = GCNConv(19, 500)
+        self.lin0 = torch.nn.Linear(19, 600)
+        self.conv1 = GCNConv(600, 500)
         self.conv2 = GCNConv(500, 400)
         self.conv3 = GCNConv(400, 300)
         self.agg = MaxAggregation()
@@ -26,6 +27,9 @@ class GCN_age(torch.nn.Module):
 
     def forward(self, graph):
         x, edge_index = graph.x, graph.edge_index
+        x = self.lin0(x)
+        x = F.relu(x)
+        x = F.dropout(x, p=0.3, training=self.training)
         x = self.conv1(x, edge_index)
         x = F.relu(x)
         x = self.conv2(x, edge_index)
