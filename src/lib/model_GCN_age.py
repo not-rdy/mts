@@ -27,7 +27,6 @@ class GCN_age(torch.nn.Module):
         x, edge_index = graph.x, graph.edge_index
         x = self.lin0(x)
         x = F.relu(x)
-        x = F.dropout(x, p=0.3, training=self.training)
         x = self.conv1(x, edge_index)
         x = F.relu(x)
         x = self.lin1(x)
@@ -35,7 +34,6 @@ class GCN_age(torch.nn.Module):
         x = F.dropout(x, p=0.3, training=self.training)
         x = self.lin2(x)
         x = F.relu(x)
-        x = F.dropout(x, p=0.3, training=self.training)
         x = self.lin3(x)
         x = self.agg(x, index=graph.batch)
         out = F.softmax(x, dim=0)
