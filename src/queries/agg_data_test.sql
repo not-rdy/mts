@@ -1,4 +1,4 @@
-create table submit_agg as
+create table test_agg as
     select
         user_id, date, part_of_day,
         avg(region_name_encoded) as region_name,
@@ -11,6 +11,6 @@ create table submit_agg as
         avg(price) as price,
         avg(request_cnt) as request_cnt
     from
-        submit_prepared
+        test_prepared
     group by
         user_id, date, part_of_day

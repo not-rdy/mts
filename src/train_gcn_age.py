@@ -4,18 +4,17 @@ import mlflow
 from tqdm import tqdm
 from lib.utils import save_f, load_f
 from base.settings import PATH_DATA_INTERIM
-from lib.models import GCN_age, params_GCN
+from lib.model_GCN_age import GCN_age, params_GCN
 from torch_geometric.loader import DataLoader
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import f1_score
 
 PATH_GRAPHS = os.path.join(PATH_DATA_INTERIM, 'age')
 
 f_names = os.listdir(PATH_GRAPHS)
-f_names = [x for x in f_names if 'users' in x]
-
-train_names = f_names[:20]
-val_names = f_names[20:25]
-test_names = f_names[25:]
+train_names = [x for x in f_names if 'train' in x]
+val_names = [x for x in f_names if 'test' in x]
+test_names = [x for x in f_names if 'val' in x]
 
 train_parts = [
     load_f(os.path.join(PATH_GRAPHS, name)) for name in train_names]
@@ -46,9 +45,18 @@ print(f"n graphs val {len(val)}")
 print(f"n graphs test {len(test)}")
 
 
-train = DataLoader(train, params_GCN['batch_size'])
-val = DataLoader(val, params_GCN['batch_size'])
-test = DataLoader(test, params_GCN['batch_size'])
+train = DataLoader(
+    dataset=train,
+    batch_size=params_GCN['batch_size'],
+    shuffle=True)
+val = DataLoader(
+    dataset=val,
+    batch_size=params_GCN['batch_size'],
+    shuffle=False)
+test = DataLoader(
+    dataset=test,
+    batch_size=params_GCN['batch_size'],
+    shuffle=False)
 
 model = GCN_age().to(device)
 optimizer = torch.optim.Adam(
@@ -63,11 +71,16 @@ if __name__ == '__main__':
     mlflow.set_experiment('GCN')
     mlflow.start_run()
 
+    list_out_test = []
+    list_y_test = []
     for epoch in range(1, params_GCN['n_epochs']+1):
 
-        list_loss_train = []
-        list_loss_val = []
-        list_loss_test = []
+        list_out_train = []
+        list_y_train = []
+
+        list_out_val = []
+        list_y_val = []
+
         print(f"[Epoch: {epoch}]")
 
         model.train()
@@ -82,7 +95,20 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
 
-            list_loss_train.append(loss.item())
+            out = list(torch.argmax(out, dim=1).cpu().numpy())
+            y = list(y.cpu().numpy())
+
+            list_out_train.extend(out)
+            list_y_train.extend(y)
+
+        f1_train_micro = f1_score(
+            y_true=list_y_train,
+            y_pred=list_out_train,
+            average='micro')
+        f1_train_macro = f1_score(
+            y_true=list_y_train,
+            y_pred=list_out_train,
+            average='macro')
 
         model.eval()
         with torch.no_grad():
@@ -91,17 +117,39 @@ if __name__ == '__main__':
 
                 out = model(batch)
                 y = batch.y.type(torch.cuda.ByteTensor)
-                loss = loss_fun(out, y)
 
-                list_loss_val.append(loss.item())
+                out = list(torch.argmax(out, dim=1).cpu().numpy())
+                y = list(y.cpu().numpy())
 
-        loss_train = sum(list_loss_train) / len(list_loss_train)
-        mlflow.log_metric(key='loss train', value=loss_train, step=epoch)
-        loss_val = sum(list_loss_val) / len(list_loss_val)
-        mlflow.log_metric(key='loss val', value=loss_val, step=epoch)
+                list_out_val.extend(out)
+                list_y_val.extend(y)
 
-    y_hat = []
-    y_true = []
+        f1_val_micro = f1_score(
+            y_true=list_y_val,
+            y_pred=list_out_val,
+            average='micro')
+        f1_val_macro = f1_score(
+            y_true=list_y_val,
+            y_pred=list_out_val,
+            average='macro')
+
+        mlflow.log_metric(
+            key='f1_train_micro',
+            value=f1_train_micro,
+            step=epoch)
+        mlflow.log_metric(
+            key='f1_train_macro',
+            value=f1_train_macro,
+            step=epoch)
+        mlflow.log_metric(
+            key='f1_val_micro',
+            value=f1_val_micro,
+            step=epoch)
+        mlflow.log_metric(
+            key='f1_val_macro',
+            value=f1_val_macro,
+            step=epoch)
+
     model.eval()
     with torch.no_grad():
         for batch in tqdm(
@@ -109,21 +157,34 @@ if __name__ == '__main__':
 
             out = model(batch)
             y = batch.y.type(torch.cuda.ByteTensor)
-            loss = loss_fun(out, y)
 
-            list_loss_test.append(loss.item())
+            out = list(torch.argmax(out, dim=1).cpu().numpy())
+            y = list(y.cpu().numpy())
+            list_out_test.extend(out)
+            list_y_test.extend(y)
 
-            hat = list(torch.argmax(out, dim=1).cpu().numpy())
-            true = list(y.cpu().numpy())
-            y_hat.extend(hat)
-            y_true.extend(true)
+    f1_test_micro = f1_score(
+        y_true=list_y_test,
+        y_pred=list_out_test,
+        average='micro')
+    f1_test_macro = f1_score(
+        y_true=list_y_test,
+        y_pred=list_out_test,
+        average='macro')
 
-    loss_test = sum(list_loss_test) / len(list_loss_test)
-    mlflow.log_metric(key='loss test', value=loss_test)
+    mlflow.log_metric(
+        key='f1_test_micro',
+        value=f1_test_micro,
+        step=epoch)
+    mlflow.log_metric(
+        key='f1_test_macro',
+        value=f1_test_macro,
+        step=epoch)
 
     labels = ['19-25', '26-35', '36-45', '46-55', '56-65', '66-inf']
-    conf_matrix = confusion_matrix(y_true, y_hat)
-    conf_matrix_norm = confusion_matrix(y_true, y_hat, normalize='true')
+    conf_matrix = confusion_matrix(list_y_test, list_out_test)
+    conf_matrix_norm = confusion_matrix(
+        list_y_test, list_out_test, normalize='true')
     plot = ConfusionMatrixDisplay(
         conf_matrix, display_labels=labels).plot().figure_
     plot_norm = ConfusionMatrixDisplay(

@@ -1,5 +1,5 @@
 -- SQLite
-create table data_prepared as
+create table val_prepared as
     select
         region_name_encoded,
         city_name_encoded,
@@ -13,6 +13,7 @@ create table data_prepared as
         part_of_day,
         request_cnt,
         user_id,
+        age
     from
         (
             select
@@ -30,9 +31,7 @@ create table data_prepared as
                 user_id,
                 age
             from
-                data
-            where
-                age != 'NULL'
+                data_val
         ) as t1
         left join
         (
@@ -40,9 +39,7 @@ create table data_prepared as
                 region_name,
                 avg(age) as region_name_encoded
             from
-                data
-            where
-                age != 'NULL'
+                data_train
             group by
                 region_name
         ) as t2
@@ -53,9 +50,7 @@ create table data_prepared as
                 city_name,
                 avg(age) as city_name_encoded
             from
-                data
-            where
-                age != 'NULL'
+                data_train
             group by
                 city_name
         ) as t3
@@ -66,9 +61,7 @@ create table data_prepared as
                 cpe_manufacturer_name,
                 avg(age) as cpe_manufacturer_name_encoded
             from
-                data
-            where
-                age != 'NULL'
+                data_train
             group by
                 cpe_manufacturer_name
         ) as t4
@@ -79,9 +72,7 @@ create table data_prepared as
                 cpe_model_name,
                 avg(age) as cpe_model_name_encoded
             from
-                data
-            where
-                age != 'NULL'
+                data_train
             group by
                 cpe_model_name
         ) as t5
@@ -92,9 +83,7 @@ create table data_prepared as
                 url_host,
                 avg(age) as url_host_encoded
             from
-                data
-            where
-                age != 'NULL'
+                data_train
             group by
                 url_host
         ) as t6
@@ -105,9 +94,7 @@ create table data_prepared as
                 cpe_type_cd,
                 avg(age) as cpe_type_cd_encoded
             from
-                data
-            where
-                age != 'NULL'
+                data_train
             group by
                 cpe_type_cd
         )  as t7
@@ -118,11 +105,8 @@ create table data_prepared as
             cpe_model_os_type,
             avg(age) as cpe_model_os_type_encoded
         from
-            data
-        where
-            age != 'NULL'
+            data_train
         group by
             cpe_model_os_type
         ) as t8
         on t1.cpe_model_os_type = t8.cpe_model_os_type
-
