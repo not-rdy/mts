@@ -5,8 +5,8 @@ from torch_geometric.nn.aggr import MaxAggregation
 
 params_GCN = {
     'device': 'cuda',
-    'batch_size': 32,
-    'lr': 0.001,
+    'batch_size': 64,
+    'lr': 0.00001,
     'weight_decay': 5e-4,
     'n_epochs': 50
 }
