@@ -16,14 +16,14 @@ class GCN_age(torch.nn.Module):
 
     def __init__(self) -> None:
         super().__init__()
-        self.lin0 = torch.nn.Linear(19, 600)
-        self.conv1 = GCNConv(600, 500)
-        self.conv2 = GCNConv(500, 400)
-        self.conv3 = GCNConv(400, 300)
+        self.lin0 = torch.nn.Linear(19, 100)
+        self.conv1 = GCNConv(100, 100)
+        self.conv2 = GCNConv(100, 100)
+        self.conv3 = GCNConv(100, 100)
         self.agg = MaxAggregation()
-        self.lin1 = torch.nn.Linear(300, 200)
-        self.lin2 = torch.nn.Linear(200, 100)
-        self.lin3 = torch.nn.Linear(100, 6)
+        self.lin1 = torch.nn.Linear(100, 80)
+        self.lin2 = torch.nn.Linear(80, 60)
+        self.lin3 = torch.nn.Linear(60, 6)
 
     def forward(self, graph):
         x, edge_index = graph.x, graph.edge_index
