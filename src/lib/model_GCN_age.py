@@ -5,7 +5,7 @@ from torch_geometric.nn.aggr import MaxAggregation
 
 params_GCN = {
     'device': 'cuda',
-    'batch_size': 64,
+    'batch_size': 32,
     'lr': 0.001,
     'weight_decay': 5e-4,
     'n_epochs': 50
@@ -18,6 +18,8 @@ class GCN_age(torch.nn.Module):
         super().__init__()
         self.lin0 = torch.nn.Linear(19, 100)
         self.conv1 = GCNConv(100, 100)
+        self.conv2 = GCNConv(100, 100)
+        self.conv3 = GCNConv(100, 100)
         self.lin1 = torch.nn.Linear(100, 80)
         self.lin2 = torch.nn.Linear(80, 60)
         self.lin3 = torch.nn.Linear(60, 6)
@@ -28,11 +30,19 @@ class GCN_age(torch.nn.Module):
         x = self.lin0(x)
         x = F.relu(x)
         x = self.conv1(x, edge_index)
+        x = F.dropout(x, p=0.3, training=self.training)
+        x = F.relu(x)
+        x = self.conv3(x, edge_index)
+        x = F.dropout(x, p=0.3, training=self.training)
+        x = F.relu(x)
+        x = self.conv3(x, edge_index)
+        x = F.dropout(x, p=0.3, training=self.training)
         x = F.relu(x)
         x = self.lin1(x)
         x = F.relu(x)
         x = F.dropout(x, p=0.3, training=self.training)
         x = self.lin2(x)
+        x = F.dropout(x, p=0.3, training=self.training)
         x = F.relu(x)
         x = self.lin3(x)
         x = self.agg(x, index=graph.batch)
