@@ -99,7 +99,7 @@ def create_graphs(users_part: list) -> list:
         'cpe_model_name', 'url_host', 'cpe_type_cd',
         'cpe_model_os_type', 'price', 'request_cnt']
     stats = db.read_data_as_df(
-        f"""
+        """
         select
             min(region_name) as min_region_name,
             min(city_name) as min_city_name,
@@ -120,7 +120,7 @@ def create_graphs(users_part: list) -> list:
             max(price) as max_price,
             max(request_cnt) as max_request_cnt
         from
-            {data_type}_agg
+            train_agg
         """
     )
     for col in cols_other:
@@ -251,7 +251,7 @@ if __name__ == '__main__':
         list_users_part.append(users_part)
 
     parts_to_dataloaders = []
-    with Pool(7) as p:
+    with Pool(6) as p:
         for res in tqdm(
                 p.imap_unordered(create_graphs, list_users_part),
                 total=len(list_users_part)):
