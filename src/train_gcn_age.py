@@ -1,3 +1,4 @@
+import pandas as pd
 import os
 import torch
 import mlflow
@@ -13,8 +14,8 @@ PATH_GRAPHS = os.path.join(PATH_DATA_INTERIM, 'age')
 
 f_names = os.listdir(PATH_GRAPHS)
 train_names = [x for x in f_names if 'train' in x]
-val_names = [x for x in f_names if 'test' in x]
-test_names = [x for x in f_names if 'val' in x]
+val_names = [x for x in f_names if 'val' in x]
+test_names = [x for x in f_names if 'test' in x]
 
 train_parts = [
     load_f(os.path.join(PATH_GRAPHS, name)) for name in train_names]
@@ -182,6 +183,9 @@ if __name__ == '__main__':
         step=epoch)
 
     labels = ['19-25', '26-35', '36-45', '46-55', '56-65', '66-inf']
+    print(pd.Series(list_y_train).value_counts(normalize=True))
+    print(pd.Series(list_y_val).value_counts(normalize=True))
+    print(pd.Series(list_y_test).value_counts(normalize=True))
     conf_matrix = confusion_matrix(list_y_test, list_out_test)
     conf_matrix_norm = confusion_matrix(
         list_y_test, list_out_test, normalize='true')

@@ -1,4 +1,3 @@
-# %%
 import os
 import numpy as np
 import pandas as pd
@@ -6,6 +5,8 @@ import pyarrow.parquet as pq
 from tqdm import tqdm
 from lib.DBManager import DBManager
 from base.settings import connector, PATH_DATA_RAW
+
+np.random.seed(1411)
 
 db = DBManager(conn=connector)
 
@@ -24,12 +25,12 @@ for name in filenames:
         columns=['user_id']).to_pandas()['user_id'].unique()
     id_users = list(id_users)
     id_users_all.extend(id_users)
-id_users_all = pd.Series(np.unique(id_users_all))
+id_users_all = pd.Series(np.unique(id_users_all))\
+    .sample(frac=1).reset_index(drop=True)
 
 id_users_submit = pq.read_table(os.path.join(PATH_DATA_RAW, 'submit_2.pqt'))\
     .to_pandas()['user_id'].tolist()
 
-np.random.seed(1411)
 id_users_train = id_users_all[
     ~id_users_all.isin(id_users_submit)].sample(frac=0.6).tolist()
 id_users_val = id_users_all[

@@ -75,7 +75,7 @@ def create_graphs(users_part: list) -> list:
     users_part = users_part.drop(['date', 'part_of_day_encoded'], axis=1)
 
     users_part['age'] = users_part['user_id'].map(mapper_target['age'])
-    users_part['age'] = users_part['user_id'].map(lambda x: get_age_bucket(x))
+    users_part['age'] = users_part['age'].map(lambda x: get_age_bucket(x))
     users_part['is_male'] = users_part['user_id'].map(mapper_target['is_male'])
     users_part = users_part.set_index(['user_id'])
     if target == 'age':
@@ -251,7 +251,7 @@ if __name__ == '__main__':
         list_users_part.append(users_part)
 
     parts_to_dataloaders = []
-    with Pool(8) as p:
+    with Pool(7) as p:
         for res in tqdm(
                 p.imap_unordered(create_graphs, list_users_part),
                 total=len(list_users_part)):
