@@ -1,4 +1,3 @@
-import pandas as pd
 import os
 import torch
 import mlflow
@@ -183,9 +182,6 @@ if __name__ == '__main__':
         step=epoch)
 
     labels = ['19-25', '26-35', '36-45', '46-55', '56-65', '66-inf']
-    print(pd.Series(list_y_train).value_counts(normalize=True))
-    print(pd.Series(list_y_val).value_counts(normalize=True))
-    print(pd.Series(list_y_test).value_counts(normalize=True))
     conf_matrix = confusion_matrix(list_y_test, list_out_test)
     conf_matrix_norm = confusion_matrix(
         list_y_test, list_out_test, normalize='true')
