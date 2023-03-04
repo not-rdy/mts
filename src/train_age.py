@@ -4,8 +4,10 @@ import mlflow
 from tqdm import tqdm
 from lib.utils import save_f, load_f
 from base.settings import PATH_DATA_INTERIM
-from lib.model_GCN_age import GCN_age, params_GCN
+from lib.params_age import params, params_model
 from torch_geometric.loader import DataLoader
+from torch_geometric.nn.models import GCN
+from torch_geometric.nn.aggr import SumAggregation
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import f1_score
 
@@ -23,7 +25,7 @@ val_parts = [
 test_parts = [
     load_f(os.path.join(PATH_GRAPHS, name)) for name in test_names]
 
-device = torch.device(params_GCN['device'])
+device = torch.device(params['device'])
 train = []
 for part in train_parts:
     part = [x.to(device) for x in part]
@@ -44,25 +46,26 @@ print(f"n graphs train {len(train)}")
 print(f"n graphs val {len(val)}")
 print(f"n graphs test {len(test)}")
 
-
 train = DataLoader(
     dataset=train,
-    batch_size=params_GCN['batch_size'],
+    batch_size=params['batch_size'],
     shuffle=True)
 val = DataLoader(
     dataset=val,
-    batch_size=params_GCN['batch_size'],
+    batch_size=params['batch_size'],
     shuffle=False)
 test = DataLoader(
     dataset=test,
-    batch_size=params_GCN['batch_size'],
+    batch_size=params['batch_size'],
     shuffle=False)
 
-model = GCN_age().to(device)
+model = GCN(**params_model).to(device)
+agg = SumAggregation()
+
 optimizer = torch.optim.Adam(
     model.parameters(),
-    lr=params_GCN['lr'],
-    weight_decay=params_GCN['weight_decay'])
+    lr=params['lr'],
+    weight_decay=params['weight_decay'])
 loss_fun = torch.nn.CrossEntropyLoss()
 
 
@@ -73,7 +76,7 @@ if __name__ == '__main__':
 
     list_out_test = []
     list_y_test = []
-    for epoch in range(1, params_GCN['n_epochs']+1):
+    for epoch in range(1, params['n_epochs']+1):
 
         list_out_train = []
         list_y_train = []
@@ -87,7 +90,9 @@ if __name__ == '__main__':
         for batch in tqdm(
                 train, total=len(train), colour='green'):
 
-            out = model(batch)
+            out = model(batch.x, batch.edge_index)
+            out = agg(out, batch.batch)
+            out = torch.softmax(out, dim=0)
             y = batch.y.type(torch.cuda.ByteTensor)
             loss = loss_fun(out, y)
 
@@ -115,7 +120,9 @@ if __name__ == '__main__':
             for batch in tqdm(
                     val, total=len(val), colour='green'):
 
-                out = model(batch)
+                out = model(batch.x, batch.edge_index)
+                out = agg(out, batch.batch)
+                out = torch.softmax(out, dim=0)
                 y = batch.y.type(torch.cuda.ByteTensor)
 
                 out = list(torch.argmax(out, dim=1).cpu().numpy())
@@ -155,7 +162,10 @@ if __name__ == '__main__':
         for batch in tqdm(
                 test, total=len(test), colour='green'):
 
-            out = model(batch)
+            out = model(batch.x, batch.edge_index)
+            out = model(batch.x, batch.edge_index)
+            out = agg(out, batch.batch)
+            out = torch.softmax(out, dim=0)
             y = batch.y.type(torch.cuda.ByteTensor)
 
             out = list(torch.argmax(out, dim=1).cpu().numpy())
@@ -201,6 +211,6 @@ if __name__ == '__main__':
     save_f(filename=os.path.join(PATH_DATA_INTERIM, 'model.pkl'), obj=model)
     mlflow.log_artifact(os.path.join(PATH_DATA_INTERIM, 'model.pkl'))
 
-    mlflow.log_params(params=params_GCN)
+    mlflow.log_params(params=params)
 
     mlflow.end_run()
