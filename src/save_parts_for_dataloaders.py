@@ -94,10 +94,6 @@ def create_graphs(users_part: list) -> list:
         x = users_part[col].copy()
         x_std = (x - x.min()) / (x.max() - x.min())
         users_part[col] = x_std.tolist()
-    cols_other = [
-        'region_name', 'city_name', 'cpe_manufacturer_name',
-        'cpe_model_name', 'url_host', 'cpe_type_cd',
-        'cpe_model_os_type', 'price', 'request_cnt']
     stats = db.read_data_as_df(
         """
         select
@@ -123,7 +119,7 @@ def create_graphs(users_part: list) -> list:
             train_agg
         """
     )
-    for col in cols_other:
+    for col in numeric_cols:
         x = users_part[col].copy()
         if col == 'region_name':
             col_min = 'min_region_name'
@@ -177,12 +173,14 @@ def create_graphs(users_part: list) -> list:
         user_seq = users_part.loc[idx]
         if type(user_seq) == pd.DataFrame:
             user_graph = nx.DiGraph(y=[user_seq.iloc[0][target]])
+            user_seq = user_seq.drop(target, axis=1)
             user_seq = list(user_seq.itertuples(index=False, name=None))
         else:
             if target == 'age':
                 user_graph = nx.DiGraph(y=[user_seq[target].item()])
             elif target == 'is_male':
-                user_graph = nx.DiGraph(y=[user_seq[target]])
+                user_graph = nx.DiGraph(y=[user_seq[target].item()])
+            user_seq = user_seq.drop(target)
             user_seq = [tuple(user_seq)]
 
         list_nodes = []
