@@ -6,7 +6,7 @@ params = {
     'n_epochs': 10
 }
 params_model = {
-    'in_chanels': 19,
+    'in_channels': 19,
     'hidden_channels': 100,
     'num_layers': 3,
     'out_channels': 6,
