@@ -6,7 +6,7 @@ from lib.utils import save_f, load_f
 from base.settings import PATH_DATA_INTERIM
 from lib.params_age import params, params_model
 from torch_geometric.loader import DataLoader
-from torch_geometric.nn.models import GCN
+from torch_geometric.nn.models import GraphSAGE
 from torch_geometric.nn.aggr import SumAggregation
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import f1_score
@@ -59,7 +59,7 @@ test = DataLoader(
     batch_size=params['batch_size'],
     shuffle=False)
 
-model = GCN(**params_model).to(device)
+model = GraphSAGE(**params_model).to(device)
 agg = SumAggregation()
 
 optimizer = torch.optim.Adam(
