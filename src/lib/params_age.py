@@ -12,5 +12,6 @@ params_model = {
     'out_channels': 6,
     'dropout': 0.2,
     'act': 'relu',
-    'aggr': 'sum'
+    'aggr': 'sum',
+    'jk': 'lstm'
 }
