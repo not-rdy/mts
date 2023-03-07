@@ -10,6 +10,5 @@ params_model = {
     'hidden_channels': 100,
     'out_channels': 6,
     'depth': 3,
-    'dropout': 0.2,
     'act': 'relu'
 }
