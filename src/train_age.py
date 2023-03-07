@@ -211,7 +211,7 @@ if __name__ == '__main__':
     save_f(
         filename=os.path.join(PATH_DATA_INTERIM, 'model.pkl'),
         obj=model)
-    
+
     mlflow.log_artifact(os.path.join(PATH_DATA_INTERIM, 'model.pkl'))
 
     mlflow.log_params(params=params)
