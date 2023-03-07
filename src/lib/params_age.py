@@ -13,5 +13,5 @@ params_model = {
     'dropout': 0.2,
     'act': 'relu',
     'aggr': 'sum',
-    'jk': 'max'
+    'jk': 'lstm'
 }
