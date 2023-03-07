@@ -9,6 +9,5 @@ params_model = {
     'in_channels': 18,
     'hidden_channels': 100,
     'out_channels': 6,
-    'depth': 3,
-    'act': 'relu'
+    'depth': 3
 }
