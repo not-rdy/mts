@@ -71,8 +71,8 @@ loss_fun = torch.nn.CrossEntropyLoss()
 
 if __name__ == '__main__':
 
-    mlflow.set_experiment('GCN')
-    mlflow.start_run()
+    mlflow.set_experiment('GNN')
+    mlflow.start_run(run_name='GCN')
 
     list_out_test = []
     list_y_test = []
