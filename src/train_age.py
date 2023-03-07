@@ -72,7 +72,7 @@ loss_fun = torch.nn.CrossEntropyLoss()
 if __name__ == '__main__':
 
     mlflow.set_experiment('GNN')
-    mlflow.start_run(run_name='GraphSAGE_tune')
+    mlflow.start_run()
 
     list_out_test = []
     list_y_test = []
