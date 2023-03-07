@@ -211,8 +211,14 @@ if __name__ == '__main__':
     mlflow.log_artifact(
         os.path.join(PATH_DATA_INTERIM, 'conf_matrix_norm.png'))
 
-    save_f(filename=os.path.join(PATH_DATA_INTERIM, 'model.pkl'), obj=model)
+    save_f(
+        filename=os.path.join(PATH_DATA_INTERIM, 'model.pkl'),
+        obj=model)
+    save_f(
+        filename=os.path.join(PATH_DATA_INTERIM, 'agg_fun.pkl'),
+        obj=agg_fun)
     mlflow.log_artifact(os.path.join(PATH_DATA_INTERIM, 'model.pkl'))
+    mlflow.log_artifact(os.path.join(PATH_DATA_INTERIM, 'agg_fun.pkl'))
 
     mlflow.log_params(params=params)
 
