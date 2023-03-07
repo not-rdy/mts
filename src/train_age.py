@@ -4,10 +4,10 @@ import mlflow
 from tqdm import tqdm
 from lib.utils import save_f, load_f
 from base.settings import PATH_DATA_INTERIM
-from lib.params_age import params, params_model, params_agg_lstm
+from lib.params_age import params, params_model
 from torch_geometric.loader import DataLoader
 from torch_geometric.nn.models import GraphSAGE
-from torch_geometric.nn.aggr import LSTMAggregation
+from torch_geometric.nn.aggr import MaxAggregation
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import f1_score
 
@@ -60,7 +60,7 @@ test = DataLoader(
     shuffle=False)
 
 model = GraphSAGE(**params_model).to(device)
-agg_fun = LSTMAggregation(**params_agg_lstm).to(device)
+agg_fun = MaxAggregation()
 
 optimizer = torch.optim.Adam(
     model.parameters(),
@@ -87,7 +87,6 @@ if __name__ == '__main__':
         print(f"[Epoch: {epoch}]")
 
         model.train()
-        agg_fun.train()
         for batch in tqdm(
                 train, total=len(train), colour='green'):
 
@@ -117,7 +116,6 @@ if __name__ == '__main__':
             average='macro')
 
         model.eval()
-        agg_fun.eval()
         with torch.no_grad():
             for batch in tqdm(
                     val, total=len(val), colour='green'):
@@ -160,7 +158,6 @@ if __name__ == '__main__':
             step=epoch)
 
     model.eval()
-    agg_fun.eval()
     with torch.no_grad():
         for batch in tqdm(
                 test, total=len(test), colour='green'):
@@ -214,11 +211,8 @@ if __name__ == '__main__':
     save_f(
         filename=os.path.join(PATH_DATA_INTERIM, 'model.pkl'),
         obj=model)
-    save_f(
-        filename=os.path.join(PATH_DATA_INTERIM, 'agg_fun.pkl'),
-        obj=agg_fun)
+    
     mlflow.log_artifact(os.path.join(PATH_DATA_INTERIM, 'model.pkl'))
-    mlflow.log_artifact(os.path.join(PATH_DATA_INTERIM, 'agg_fun.pkl'))
 
     mlflow.log_params(params=params)
 
