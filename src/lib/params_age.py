@@ -6,8 +6,15 @@ params = {
     'n_epochs': 5
 }
 params_model = {
-    'in_channels': 18,
     'hidden_channels': 100,
     'out_channels': 6,
-    'depth': 3
+    'num_blocks': 3,
+    'num_bilinear': 100,
+    'num_spherical': 3,
+    'num_radial': 3,
+    'max_num_neighbors': 200,
+    'num_before_skip': 2,
+    'num_after_skip': 2,
+    'num_output_layers': 3,
+    'act': 'swish'
 }
