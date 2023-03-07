@@ -18,7 +18,7 @@ params_model = {
 params_agg_lstm = {
     'in_channels': 100,
     'out_channels': 6,
-    'num_layers': 2,
-    'dropout': 0.2,
+    'num_layers': 1,
+    'dropout': 0,
     'bidirectional': False
 }
