@@ -4,10 +4,10 @@ import mlflow
 from tqdm import tqdm
 from lib.utils import save_f, load_f
 from base.settings import PATH_DATA_INTERIM
-from lib.params_age import params, params_model
+from lib.params_age import params, params_model, params_agg_lstm
 from torch_geometric.loader import DataLoader
 from torch_geometric.nn.models import GraphSAGE
-from torch_geometric.nn.aggr import MaxAggregation
+from torch_geometric.nn.aggr import LSTMAggregation
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import f1_score
 
@@ -60,7 +60,7 @@ test = DataLoader(
     shuffle=False)
 
 model = GraphSAGE(**params_model).to(device)
-agg = MaxAggregation()
+agg_fun = LSTMAggregation(**params_agg_lstm)
 
 optimizer = torch.optim.Adam(
     model.parameters(),
@@ -87,11 +87,12 @@ if __name__ == '__main__':
         print(f"[Epoch: {epoch}]")
 
         model.train()
+        agg_fun.train()
         for batch in tqdm(
                 train, total=len(train), colour='green'):
 
             out = model(batch.x, batch.edge_index)
-            out = agg(out, batch.batch)
+            out = agg_fun(out, batch.batch)
             out = torch.softmax(out, dim=0)
             y = batch.y.type(torch.cuda.ByteTensor)
             loss = loss_fun(out, y)
@@ -116,12 +117,13 @@ if __name__ == '__main__':
             average='macro')
 
         model.eval()
+        agg_fun.eval()
         with torch.no_grad():
             for batch in tqdm(
                     val, total=len(val), colour='green'):
 
                 out = model(batch.x, batch.edge_index)
-                out = agg(out, batch.batch)
+                out = agg_fun(out, batch.batch)
                 out = torch.softmax(out, dim=0)
                 y = batch.y.type(torch.cuda.ByteTensor)
 
@@ -158,13 +160,14 @@ if __name__ == '__main__':
             step=epoch)
 
     model.eval()
+    agg_fun.eval()
     with torch.no_grad():
         for batch in tqdm(
                 test, total=len(test), colour='green'):
 
             out = model(batch.x, batch.edge_index)
             out = model(batch.x, batch.edge_index)
-            out = agg(out, batch.batch)
+            out = agg_fun(out, batch.batch)
             out = torch.softmax(out, dim=0)
             y = batch.y.type(torch.cuda.ByteTensor)
 
