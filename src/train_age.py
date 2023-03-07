@@ -6,7 +6,7 @@ from lib.utils import save_f, load_f
 from base.settings import PATH_DATA_INTERIM
 from lib.params_age import params, params_model
 from torch_geometric.loader import DataLoader
-from torch_geometric.nn.models import PNA
+from torch_geometric.nn.models import GraphUNet
 from torch_geometric.nn.aggr import MaxAggregation
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import f1_score
@@ -59,7 +59,7 @@ test = DataLoader(
     batch_size=params['batch_size'],
     shuffle=False)
 
-model = PNA(**params_model).to(device)
+model = GraphUNet(**params_model).to(device)
 agg = MaxAggregation()
 
 optimizer = torch.optim.Adam(
@@ -72,7 +72,7 @@ loss_fun = torch.nn.CrossEntropyLoss()
 if __name__ == '__main__':
 
     mlflow.set_experiment('GNN')
-    mlflow.start_run(run_name='PNA')
+    mlflow.start_run(run_name='GraphUNet')
 
     list_out_test = []
     list_y_test = []
