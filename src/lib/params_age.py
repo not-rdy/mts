@@ -1,9 +1,9 @@
 params = {
     'device': 'cuda',
-    'batch_size': 16,
+    'batch_size': 32,
     'lr': 5e-5,
     'weight_decay': 5e-5,
-    'n_epochs': 30
+    'n_epochs': 100
 }
 params_model = {
     'in_channels': 18,
