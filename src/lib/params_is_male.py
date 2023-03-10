@@ -3,7 +3,7 @@ params = {
     'batch_size': 64,
     'lr': 5e-6,
     'weight_decay': 5e-6,
-    'n_epochs': 100
+    'n_epochs': 20
 }
 params_model = {
     'in_channels': 18,
