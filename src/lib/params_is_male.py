@@ -8,7 +8,7 @@ params = {
 params_model = {
     'in_channels': 18,
     'hidden_channels': 100,
-    'num_layers': 2,
+    'num_layers': 4,
     'out_channels': 1,
     'dropout': 0.2,
     'act': 'relu',
