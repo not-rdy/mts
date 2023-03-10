@@ -65,7 +65,7 @@ optimizer = torch.optim.Adam(
     model.parameters(),
     lr=params['lr'],
     weight_decay=params['weight_decay'])
-loss_fun = torch.nn.MSELoss()
+loss_fun = torch.nn.BCELoss()
 
 
 if __name__ == '__main__':
