@@ -8,8 +8,8 @@ from lib.params_is_male import params, params_model
 from torch_geometric.loader import DataLoader
 from torch_geometric.nn.models import GraphSAGE
 from torch_geometric.nn.aggr import MaxAggregation
-from sklearn.metrics import mean_squared_error
-
+from sklearn.metrics import f1_score
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 PATH_GRAPHS = os.path.join(PATH_DATA_INTERIM, 'is_male')
 
 f_names = os.listdir(PATH_GRAPHS)
@@ -99,16 +99,16 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
 
-            out = [x.item() for x in out]
+            out = [1 if x.item() >= 0.5 else 0 for x in out]
             y = list(y.cpu().numpy())
 
             list_out_train.extend(out)
             list_y_train.extend(y)
 
-        rmse_train = mean_squared_error(
-            y_true=list_y_train, y_pred=list_out_train, squared=False)
+        f1_train = f1_score(
+            y_true=list_y_train, y_pred=list_out_train)
         mlflow.log_metric(
-            key='rmse_train', value=rmse_train, step=epoch)
+            key='f1_train', value=f1_train, step=epoch)
 
         save_f(
             filename=os.path.join(PATH_DATA_INTERIM, f'model_{epoch}.pkl'),
@@ -126,16 +126,16 @@ if __name__ == '__main__':
                 out = torch.sigmoid(out)
                 y = batch.y
 
-                out = [x.item() for x in out]
+                out = [1 if x.item() >= 0.5 else 0 for x in out]
                 y = list(y.cpu().numpy())
 
                 list_out_val.extend(out)
                 list_y_val.extend(y)
 
-        rmse_val = mean_squared_error(
-            y_true=list_y_val, y_pred=list_out_val, squared=False)
+        f1_val = f1_score(
+            y_true=list_y_val, y_pred=list_out_val)
         mlflow.log_metric(
-            key='rmse_val', value=rmse_val, step=epoch)
+            key='f1_val', value=f1_val, step=epoch)
 
     model.eval()
     with torch.no_grad():
@@ -147,16 +147,30 @@ if __name__ == '__main__':
             out = torch.sigmoid(out)
             y = batch.y
 
-            out = [x.item() for x in out]
+            out = [1 if x.item() >= 0.5 else 0 for x in out]
             y = list(y.cpu().numpy())
 
             list_out_test.extend(out)
             list_y_test.extend(y)
 
-    rmse_test = mean_squared_error(
-        y_true=list_y_test, y_pred=list_out_test, squared=False)
+    f1_test = f1_score(
+        y_true=list_y_test, y_pred=list_out_test)
     mlflow.log_metric(
-        key='rmse_test', value=rmse_test, step=epoch)
+        key='f1_test', value=f1_test, step=epoch)
+
+    conf_matrix = confusion_matrix(list_y_test, list_out_test)
+    conf_matrix_norm = confusion_matrix(
+        list_y_test, list_out_test, normalize='true')
+    plot = ConfusionMatrixDisplay(conf_matrix).plot().figure_
+    plot_norm = ConfusionMatrixDisplay(conf_matrix_norm).plot().figure_
+    plot.savefig(
+        os.path.join(PATH_DATA_INTERIM, 'conf_matrix.png'))
+    plot_norm.savefig(
+        os.path.join(PATH_DATA_INTERIM, 'conf_matrix_norm.png'))
+    mlflow.log_artifact(
+        os.path.join(PATH_DATA_INTERIM, 'conf_matrix.png'))
+    mlflow.log_artifact(
+        os.path.join(PATH_DATA_INTERIM, 'conf_matrix_norm.png'))
 
     mlflow.log_params(params=params)
 
