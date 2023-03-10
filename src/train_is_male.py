@@ -110,6 +110,12 @@ if __name__ == '__main__':
         mlflow.log_metric(
             key='rmse_train', value=rmse_train, step=epoch)
 
+        save_f(
+            filename=os.path.join(PATH_DATA_INTERIM, 'model.pkl'),
+            obj=model)
+        mlflow.log_artifact(
+            os.path.join(PATH_DATA_INTERIM, f'model_{epoch}.pkl'))
+
         model.eval()
         with torch.no_grad():
             for batch in tqdm(
@@ -151,9 +157,6 @@ if __name__ == '__main__':
         y_true=list_y_test, y_pred=list_out_test, squared=False)
     mlflow.log_metric(
         key='rmse_test', value=rmse_test, step=epoch)
-
-    save_f(filename=os.path.join(PATH_DATA_INTERIM, 'model.pkl'), obj=model)
-    mlflow.log_artifact(os.path.join(PATH_DATA_INTERIM, 'model.pkl'))
 
     mlflow.log_params(params=params)
 
