@@ -1,6 +1,6 @@
 params = {
     'device': 'cuda',
-    'batch_size': 8,
+    'batch_size': 16,
     'lr': 5e-4,
     'weight_decay': 5e-5,
     'n_epochs': 200
