@@ -94,8 +94,8 @@ if __name__ == '__main__':
                 train, total=len(train), colour='green'):
 
             out = model(batch.x, batch.edge_index)
-            out = linear(out)
             out = agg_fun(out, batch.batch)
+            out = linear(out)
             out = torch.softmax(out, dim=0)
             y = batch.y.type(torch.cuda.ByteTensor)
             loss = loss_fun(out, y)
@@ -131,8 +131,8 @@ if __name__ == '__main__':
                     val, total=len(val), colour='green'):
 
                 out = model(batch.x, batch.edge_index)
-                out = linear(out)
                 out = agg_fun(out, batch.batch)
+                out = linear(out)
                 out = torch.softmax(out, dim=0)
                 y = batch.y.type(torch.cuda.ByteTensor)
 
@@ -193,8 +193,8 @@ if __name__ == '__main__':
                 test, total=len(test), colour='green'):
 
             out = model(batch.x, batch.edge_index)
-            out = linear(out)
             out = agg_fun(out, batch.batch)
+            out = linear(out)
             out = torch.softmax(out, dim=0)
             y = batch.y.type(torch.cuda.ByteTensor)
 

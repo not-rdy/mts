@@ -80,6 +80,8 @@ def create_graphs(users_part: list) -> list:
     users_part = users_part.set_index(['user_id'])
     if target == 'age':
         users_part = users_part.drop('is_male', axis=1)
+        users_part = users_part[
+            users_part['age'].map(lambda x: not pd.isna(x))]
     elif target == 'is_male':
         users_part = users_part.drop('age', axis=1)
         users_part = users_part[users_part['is_male'] != 'NA']
@@ -179,7 +181,7 @@ def create_graphs(users_part: list) -> list:
             user_seq = list(user_seq.itertuples(index=False, name=None))
         elif type(user_seq) == pd.Series and target in ['age', 'is_male']:
             user_graph = nx.DiGraph(y=[user_seq[target].item()])
-            user_seq = user_seq.drop(target, axis=1)
+            user_seq = user_seq.drop(target)
             user_seq = [tuple(user_seq)]
         elif type(user_seq) == pd.DataFrame and target == 'none':
             user_graph = nx.DiGraph(user_id=[idx])
