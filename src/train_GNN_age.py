@@ -60,7 +60,7 @@ test = DataLoader(
     shuffle=False)
 
 model = GraphSAGE(**params_model).to(device)
-linear = torch.nn.Linear(100, 6).to(device)
+linear = torch.nn.Linear(50, 6).to(device)
 agg_fun = MeanAggregation()
 
 optimizer = torch.optim.Adam(
