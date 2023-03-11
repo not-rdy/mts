@@ -7,7 +7,7 @@ from base.settings import PATH_DATA_INTERIM
 from lib.params_age import params, params_model
 from torch_geometric.loader import DataLoader
 from torch_geometric.nn.models import GraphSAGE
-from torch_geometric.nn.aggr import MaxAggregation
+from torch_geometric.nn.aggr import MeanAggregation
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import f1_score
 
@@ -61,7 +61,7 @@ test = DataLoader(
 
 model = GraphSAGE(**params_model).to(device)
 linear = torch.nn.Linear(100, 6).to(device)
-agg_fun = MaxAggregation()
+agg_fun = MeanAggregation()
 
 optimizer = torch.optim.Adam(
     model.parameters(),
