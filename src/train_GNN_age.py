@@ -113,8 +113,13 @@ if __name__ == '__main__':
         save_f(
             filename=os.path.join(PATH_DATA_INTERIM, f'model_{epoch}.pkl'),
             obj=model)
+        save_f(
+            filename=os.path.join(PATH_DATA_INTERIM, f'linear_{epoch}.pkl'),
+            obj=linear)
         mlflow.log_artifact(
             os.path.join(PATH_DATA_INTERIM, f'model_{epoch}.pkl'))
+        mlflow.log_artifact(
+            os.path.join(PATH_DATA_INTERIM, f'linear_{epoch}.pkl'))
 
         f1_train_micro = f1_score(
             y_true=list_y_train,
