@@ -66,7 +66,8 @@ optimizer = torch.optim.Adam(
     model.parameters(),
     lr=params['lr'],
     weight_decay=params['weight_decay'])
-loss_fun = torch.nn.CrossEntropyLoss()
+loss_fun = torch.nn.CrossEntropyLoss(
+    weight=torch.tensor(params['weights_loss']))
 
 
 if __name__ == '__main__':

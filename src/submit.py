@@ -28,7 +28,7 @@ submit = DataLoader(
     shuffle=False)
 
 path_model_age = mlflow.artifacts.download_artifacts(
-    artifact_uri='runs:/39df34b9de404518afa4f7e25b1d3820/model.pkl')
+    artifact_uri='runs:/d65583f507004d76a887fd1abfa237a1/model_100.pkl')
 path_model_is_male = mlflow.artifacts.download_artifacts(
     artifact_uri='runs:/2ebc84bc596d4027925fa916214199f7/model_1000.pkl'
 )
@@ -65,4 +65,4 @@ submit = pd.DataFrame({
     'is_male': list_out_is_male
     })
 submit.to_csv(
-    os.path.join(PATH_DATA_INTERIM, 'submission.csv'))
+    os.path.join(PATH_DATA_INTERIM, 'submission.csv'), index=False)
