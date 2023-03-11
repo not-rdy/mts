@@ -71,7 +71,7 @@ loss_fun = torch.nn.CrossEntropyLoss()
 
 if __name__ == '__main__':
 
-    mlflow.set_experiment('GNN')
+    mlflow.set_experiment('GNN_age')
     mlflow.start_run()
 
     list_out_test = []
@@ -105,6 +105,12 @@ if __name__ == '__main__':
 
             list_out_train.extend(out)
             list_y_train.extend(y)
+
+        save_f(
+            filename=os.path.join(PATH_DATA_INTERIM, f'model_{epoch}.pkl'),
+            obj=model)
+        mlflow.log_artifact(
+            os.path.join(PATH_DATA_INTERIM, f'model_{epoch}.pkl'))
 
         f1_train_micro = f1_score(
             y_true=list_y_train,
@@ -207,12 +213,6 @@ if __name__ == '__main__':
         os.path.join(PATH_DATA_INTERIM, 'conf_matrix.png'))
     mlflow.log_artifact(
         os.path.join(PATH_DATA_INTERIM, 'conf_matrix_norm.png'))
-
-    save_f(
-        filename=os.path.join(PATH_DATA_INTERIM, 'model.pkl'),
-        obj=model)
-
-    mlflow.log_artifact(os.path.join(PATH_DATA_INTERIM, 'model.pkl'))
 
     mlflow.log_params(params=params)
 
