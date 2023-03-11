@@ -3,7 +3,7 @@ params = {
     'batch_size': 64,
     'lr': 5e-5,
     'weight_decay': 5e-5,
-    'n_epochs': 100,
+    'n_epochs': 1000,
     'weights_loss': [0.151, 0.0152, 0.079, 0.134, 0.27, 0.3508]
 }
 params_model = {
