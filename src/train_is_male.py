@@ -137,6 +137,23 @@ if __name__ == '__main__':
         mlflow.log_metric(
             key='f1_val', value=f1_val, step=epoch)
 
+        conf_matrix_val = confusion_matrix(list_y_val, list_out_val)
+        conf_matrix_norm_val = confusion_matrix(
+            list_y_val, list_out_val, normalize='true')
+        plot = ConfusionMatrixDisplay(conf_matrix_val).plot().figure_
+        plot_norm = ConfusionMatrixDisplay(conf_matrix_norm_val).plot().figure_
+        plot.savefig(
+            os.path.join(PATH_DATA_INTERIM, f'conf_matrix_val_{epoch}.png'))
+        plot_norm.savefig(
+            os.path.join(
+                PATH_DATA_INTERIM, f'conf_matrix_norm_val_{epoch}.png'))
+        mlflow.log_artifact(
+            os.path.join(PATH_DATA_INTERIM, f'conf_matrix_val_{epoch}.png'))
+        mlflow.log_artifact(
+            os.path.join(
+                PATH_DATA_INTERIM, f'conf_matrix_norm_val_{epoch}.png'))
+        del plot, plot_norm
+
     model.eval()
     with torch.no_grad():
         for batch in tqdm(

@@ -182,6 +182,7 @@ if __name__ == '__main__':
         mlflow.log_artifact(
             os.path.join(
                 PATH_DATA_INTERIM, f'conf_matrix_norm_val_{epoch}.png'))
+        del plot, plot_norm
 
     model.eval()
     with torch.no_grad():
