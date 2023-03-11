@@ -77,6 +77,7 @@ if __name__ == '__main__':
 
     list_out_test = []
     list_y_test = []
+    labels = ['19-25', '26-35', '36-45', '46-55', '56-65', '66-inf']
     for epoch in range(1, params['n_epochs']+1):
 
         list_out_train = []
@@ -163,6 +164,24 @@ if __name__ == '__main__':
             key='f1_val_macro',
             value=f1_val_macro,
             step=epoch)
+
+        conf_matrix_val = confusion_matrix(list_y_val, list_out_val)
+        conf_matrix_norm_val = confusion_matrix(
+            list_y_val, list_out_val, normalize='true')
+        plot = ConfusionMatrixDisplay(
+            conf_matrix_val, display_labels=labels).plot().figure_
+        plot_norm = ConfusionMatrixDisplay(
+            conf_matrix_norm_val, display_labels=labels).plot().figure_
+        plot.savefig(
+            os.path.join(PATH_DATA_INTERIM, f'conf_matrix_val_{epoch}.png'))
+        plot_norm.savefig(
+            os.path.join(
+                PATH_DATA_INTERIM, f'conf_matrix_norm_val_{epoch}.png'))
+        mlflow.log_artifact(
+            os.path.join(PATH_DATA_INTERIM, f'conf_matrix_val_{epoch}.png'))
+        mlflow.log_artifact(
+            os.path.join(
+                PATH_DATA_INTERIM, f'conf_matrix_norm_val_{epoch}.png'))
 
     model.eval()
     with torch.no_grad():
