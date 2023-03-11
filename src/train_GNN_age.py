@@ -60,7 +60,8 @@ test = DataLoader(
     shuffle=False)
 
 model = GraphSAGE(**params_model).to(device)
-agg_fun = LSTMAggregation(in_channels=50, out_channels=50)
+agg_fun = LSTMAggregation(
+    in_channels=50, out_channels=50).to(device)
 linear = torch.nn.Linear(50, 6).to(device)
 
 optimizer = torch.optim.Adam(
