@@ -5,7 +5,7 @@ import pandas as pd
 from tqdm import tqdm
 from lib.utils import load_f
 from torch_geometric.loader import DataLoader
-from torch_geometric.nn.aggr import MaxAggregation, MeanAggregation
+from torch_geometric.nn.aggr import MeanAggregation
 from base.settings import PATH_DATA_INTERIM
 
 PATH_GRAPHS = os.path.join(PATH_DATA_INTERIM, 'none')
@@ -28,17 +28,20 @@ submit = DataLoader(
     shuffle=False)
 
 path_model_age = mlflow.artifacts.download_artifacts(
-    artifact_uri='runs:/d099e8a27d6c4452bf8b5105119c7604/model_464.pkl')
+    artifact_uri='runs:/b4caa8e2bd9b47e196ddfcfcbb73ec5e/model_77.pkl')
 path_linear_age = mlflow.artifacts.download_artifacts(
-    artifact_uri='runs:/d099e8a27d6c4452bf8b5105119c7604/linear_464.pkl')
+    artifact_uri='runs:/b4caa8e2bd9b47e196ddfcfcbb73ec5e/linear_77.pkl')
 path_model_is_male = mlflow.artifacts.download_artifacts(
-    artifact_uri='runs:/2ebc84bc596d4027925fa916214199f7/model_1000.pkl')
+    artifact_uri='runs:/82c6330ec0f54ced9a7662f040eeb6d5/model_98.pkl')
+path_linear_ismale = mlflow.artifacts.download_artifacts(
+    artifact_uri='runs:/82c6330ec0f54ced9a7662f040eeb6d5/linear_98.pkl')
 
 model_age = load_f(path_model_age).to(device)
 linear_age = load_f(path_linear_age).to(device)
 model_is_male = load_f(path_model_is_male).to(device)
-agg_fun_ismale = MaxAggregation()
-agg_fun_age = MeanAggregation()
+linear_ismale = load_f(path_linear_ismale).to(device)
+
+agg_fun = MeanAggregation()
 
 list_user_id = []
 list_out_age = []
@@ -48,14 +51,15 @@ for batch in tqdm(submit, total=len(submit), colour='green'):
     users_id = [x.item() for x in batch.user_id]
 
     out_age = model_age(batch.x, batch.edge_index)
-    out_age = agg_fun_age(out_age, batch.batch)
+    out_age = agg_fun(out_age, batch.batch)
     out_age = linear_age(out_age)
     out_age = torch.softmax(out_age, dim=0)
     out_age = list(torch.argmax(out_age, dim=1).cpu().numpy())
     out_age = [x + 1 for x in out_age]
 
     out_is_male = model_is_male(batch.x, batch.edge_index)
-    out_is_male = agg_fun_ismale(out_is_male, batch.batch)
+    out_is_male = agg_fun(out_is_male, batch.batch)
+    out_is_male = linear_ismale(out_is_male)
     out_is_male = torch.sigmoid(out_is_male)
     out_is_male = [x.item() for x in out_is_male]
 
