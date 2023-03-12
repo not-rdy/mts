@@ -7,7 +7,7 @@ from base.settings import PATH_DATA_INTERIM
 from lib.params_age import params, params_model
 from torch_geometric.loader import DataLoader
 from torch_geometric.nn.models import GraphSAGE
-from torch_geometric.nn.aggr import LSTMAggregation
+from torch_geometric.nn.aggr import MeanAggregation
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import f1_score
 
@@ -60,9 +60,8 @@ test = DataLoader(
     shuffle=False)
 
 model = GraphSAGE(**params_model).to(device)
-agg_fun = LSTMAggregation(
-    in_channels=50, out_channels=50).to(device)
-linear = torch.nn.Linear(50, 6).to(device)
+agg_fun = MeanAggregation()
+linear = torch.nn.Linear(100, 6).to(device)
 
 optimizer = torch.optim.Adam(
     model.parameters(),
@@ -117,15 +116,10 @@ if __name__ == '__main__':
         save_f(
             filename=os.path.join(PATH_DATA_INTERIM, f'linear_{epoch}.pkl'),
             obj=linear)
-        save_f(
-            filename=os.path.join(PATH_DATA_INTERIM, f'agg_fun_{epoch}.pkl'),
-            obj=agg_fun)
         mlflow.log_artifact(
             os.path.join(PATH_DATA_INTERIM, f'model_{epoch}.pkl'))
         mlflow.log_artifact(
             os.path.join(PATH_DATA_INTERIM, f'linear_{epoch}.pkl'))
-        mlflow.log_artifact(
-            os.path.join(PATH_DATA_INTERIM, f'agg_fun_{epoch}.pkl'))
 
         f1_train_micro = f1_score(
             y_true=list_y_train,
