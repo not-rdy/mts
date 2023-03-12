@@ -1,17 +1,17 @@
 params = {
     'device': 'cuda',
-    'batch_size': 16,
-    'lr': 5e-5,
+    'batch_size': 32,
+    'lr': 5e-4,
     'weight_decay': 5e-5,
-    'n_epochs': 1000
+    'n_epochs': 100
 }
 params_model = {
     'in_channels': 18,
     'hidden_channels': 100,
-    'num_layers': 6,
-    'out_channels': 1,
-    'dropout': 0.5,
+    'num_layers': 10,
+    'out_channels': 100,
+    'dropout': 0.3,
     'act': 'relu',
-    'aggr': 'max',
+    'aggr': 'mean',
     'jk': 'cat'
 }

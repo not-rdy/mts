@@ -5,7 +5,7 @@ import numpy as np
 from tqdm import tqdm
 from lib.utils import load_f
 from torch_geometric.loader import DataLoader
-from torch_geometric.nn.aggr import MaxAggregation
+from torch_geometric.nn.aggr import MeanAggregation
 from catboost import CatBoostClassifier
 from base.settings import PATH_DATA_INTERIM
 from sklearn.metrics import f1_score
@@ -59,9 +59,9 @@ test = DataLoader(
     shuffle=False)
 
 path_GNNModel_age = mlflow.artifacts.download_artifacts(
-    artifact_uri='runs:/bdfe7e4b51464ee1855eae1afe6b70b1/model_3.pkl')
+    artifact_uri='runs:/b4caa8e2bd9b47e196ddfcfcbb73ec5e/model_77.pkl')
 GNNModel_age = load_f(path_GNNModel_age).to(device)
-agg_fun = MaxAggregation()
+agg_fun = MeanAggregation()
 
 print('Getting train features ...')
 list_train_features = []
@@ -117,12 +117,11 @@ test_y = np.concatenate(list_test_y, axis=0)
 
 print('Train CatBoost ...')
 cat = CatBoostClassifier(
+    eta=0.001,
     iterations=10000,
     early_stopping_rounds=1000,
     use_best_model=True,
-    verbose=100,
-    task_type='GPU',
-    devices='0')
+    verbose=100)
 cat.fit(
     X=train_features, y=train_y,
     eval_set=(val_features, val_y))

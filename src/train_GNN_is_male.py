@@ -7,7 +7,7 @@ from base.settings import PATH_DATA_INTERIM
 from lib.params_is_male import params, params_model
 from torch_geometric.loader import DataLoader
 from torch_geometric.nn.models import GraphSAGE
-from torch_geometric.nn.aggr import MaxAggregation
+from torch_geometric.nn.aggr import MeanAggregation
 from sklearn.metrics import f1_score
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 PATH_GRAPHS = os.path.join(PATH_DATA_INTERIM, 'is_male')
@@ -59,7 +59,8 @@ test = DataLoader(
     shuffle=False)
 
 model = GraphSAGE(**params_model).to(device)
-agg_fun = MaxAggregation()
+agg_fun = MeanAggregation()
+linear = torch.nn.Linear(100, 1)
 
 optimizer = torch.optim.Adam(
     model.parameters(),
@@ -91,6 +92,7 @@ if __name__ == '__main__':
 
             out = model(batch.x, batch.edge_index)
             out = agg_fun(out, batch.batch)
+            out = linear(out)
             out = torch.sigmoid(out).reshape(-1)
             y = batch.y.type(torch.cuda.FloatTensor)
             loss = loss_fun(out, y)
@@ -113,8 +115,13 @@ if __name__ == '__main__':
         save_f(
             filename=os.path.join(PATH_DATA_INTERIM, f'model_{epoch}.pkl'),
             obj=model)
+        save_f(
+            filename=os.path.join(PATH_DATA_INTERIM, f'linear_{epoch}.pkl'),
+            obj=linear)
         mlflow.log_artifact(
             os.path.join(PATH_DATA_INTERIM, f'model_{epoch}.pkl'))
+        mlflow.log_artifact(
+            os.path.join(PATH_DATA_INTERIM, f'linear_{epoch}.pkl'))
 
         model.eval()
         with torch.no_grad():
@@ -123,6 +130,7 @@ if __name__ == '__main__':
 
                 out = model(batch.x, batch.edge_index)
                 out = agg_fun(out, batch.batch)
+                out = linear(out)
                 out = torch.sigmoid(out)
                 y = batch.y
 
@@ -161,6 +169,7 @@ if __name__ == '__main__':
 
             out = model(batch.x, batch.edge_index)
             out = agg_fun(out, batch.batch)
+            out = linear(out)
             out = torch.sigmoid(out)
             y = batch.y
 
