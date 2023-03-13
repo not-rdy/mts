@@ -176,18 +176,18 @@ def create_graphs(users_part: list) -> list:
     for idx in users_part.index.unique():
         user_seq = users_part.loc[idx]
         if type(user_seq) == pd.DataFrame and target in ['age', 'is_male']:
-            user_graph = nx.DiGraph(y=[user_seq.iloc[0][target]])
+            user_graph = nx.Graph(y=[user_seq.iloc[0][target]])
             user_seq = user_seq.drop(target, axis=1)
             user_seq = list(user_seq.itertuples(index=False, name=None))
         elif type(user_seq) == pd.Series and target in ['age', 'is_male']:
-            user_graph = nx.DiGraph(y=[user_seq[target].item()])
+            user_graph = nx.Graph(y=[user_seq[target].item()])
             user_seq = user_seq.drop(target)
             user_seq = [tuple(user_seq)]
         elif type(user_seq) == pd.DataFrame and target == 'none':
-            user_graph = nx.DiGraph(user_id=[idx])
+            user_graph = nx.Graph(user_id=[idx])
             user_seq = list(user_seq.itertuples(index=False, name=None))
         elif type(user_seq) == pd.Series and target == 'none':
-            user_graph = nx.DiGraph(user_id=[idx])
+            user_graph = nx.Graph(user_id=[idx])
             user_seq = [tuple(user_seq)]
 
         list_nodes = []
