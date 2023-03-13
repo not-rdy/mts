@@ -4,7 +4,7 @@ norm = BatchNorm(in_channels=100)
 
 params = {
     'device': 'cuda',
-    'batch_size': 64,
+    'batch_size': 32,
     'lr': 5e-4,
     'weight_decay': 5e-5,
     'n_epochs': 20,

@@ -1,9 +1,13 @@
+from torch_geometric.nn.norm import BatchNorm
+
+norm = BatchNorm(in_channels=100)
+
 params = {
     'device': 'cuda',
-    'batch_size': 16,
+    'batch_size': 32,
     'lr': 5e-5,
     'weight_decay': 5e-5,
-    'n_epochs': 100
+    'n_epochs': 20
 }
 params_model = {
     'in_channels': 18,
@@ -13,5 +17,6 @@ params_model = {
     'dropout': 0.3,
     'act': 'relu',
     'aggr': 'mean',
-    'jk': 'cat'
+    'jk': 'cat',
+    'norm': norm
 }
