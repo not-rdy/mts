@@ -28,13 +28,13 @@ submit = DataLoader(
     shuffle=False)
 
 path_model_age = mlflow.artifacts.download_artifacts(
-    artifact_uri='runs:/b4caa8e2bd9b47e196ddfcfcbb73ec5e/model_77.pkl')
+    artifact_uri='runs:/e324274c18c84316bbeb1937ae6794e5/model_19.pkl')
 path_linear_age = mlflow.artifacts.download_artifacts(
-    artifact_uri='runs:/b4caa8e2bd9b47e196ddfcfcbb73ec5e/linear_77.pkl')
+    artifact_uri='runs:/e324274c18c84316bbeb1937ae6794e5/linear_19.pkl')
 path_model_is_male = mlflow.artifacts.download_artifacts(
-    artifact_uri='runs:/82c6330ec0f54ced9a7662f040eeb6d5/model_98.pkl')
+    artifact_uri='runs:/f102a8ee572447baa4e6ba6b1304f2f1/model_11.pkl')
 path_linear_ismale = mlflow.artifacts.download_artifacts(
-    artifact_uri='runs:/82c6330ec0f54ced9a7662f040eeb6d5/linear_98.pkl')
+    artifact_uri='runs:/f102a8ee572447baa4e6ba6b1304f2f1/linear_11.pkl')
 
 model_age = load_f(path_model_age).to(device)
 linear_age = load_f(path_linear_age).to(device)
