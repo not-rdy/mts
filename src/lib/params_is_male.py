@@ -5,14 +5,14 @@ norm = BatchNorm(in_channels=100)
 params = {
     'device': 'cuda',
     'batch_size': 32,
-    'lr': 5e-4,
+    'lr': 5e-5,
     'weight_decay': 5e-5,
-    'n_epochs': 20
+    'n_epochs': 100
 }
 params_model = {
     'in_channels': 18,
     'hidden_channels': 100,
-    'num_layers': 3,
+    'num_layers': 4,
     'out_channels': 100,
     'dropout': 0.3,
     'act': 'relu',
