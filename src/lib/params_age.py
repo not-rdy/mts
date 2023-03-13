@@ -1,13 +1,15 @@
 from torch_geometric.nn.norm import BatchNorm
 
-norm = BatchNorm(in_channels=100)
+norm = BatchNorm(
+    in_channels=100,
+    momentum=0.01)
 
 params = {
     'device': 'cuda',
     'batch_size': 32,
     'lr': 5e-4,
     'weight_decay': 5e-5,
-    'n_epochs': 20,
+    'n_epochs': 100,
     'weights_loss': [0.151, 0.0152, 0.079, 0.134, 0.27, 0.3508]
 }
 params_model = {
