@@ -71,7 +71,7 @@ loss_fun = torch.nn.BCELoss()
 
 if __name__ == '__main__':
 
-    mlflow.set_experiment('GNN_is_male')
+    mlflow.set_experiment('GNN_is_male_undir')
     mlflow.start_run()
 
     list_out_test = []
