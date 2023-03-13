@@ -1,6 +1,8 @@
 from torch_geometric.nn.norm import BatchNorm
 
-norm = BatchNorm(in_channels=100)
+norm = BatchNorm(
+    in_channels=100,
+    momentum=0.01)
 
 params = {
     'device': 'cuda',
