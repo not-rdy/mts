@@ -1,5 +1,6 @@
 data
 models
+src/__pycache__
 src/base/__pycache__
 src/lib/__pycache__
 src/SQLite.sql
